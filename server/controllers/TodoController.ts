@@ -16,7 +16,7 @@ const create = async (ctx: Context) => {
 };
 const show = async (ctx: Context) => {
   const { id } = ctx.params;
-  const todos = await TodoModel.findById({_id: id}).sort({});
+  const todos = await TodoModel.findById({_id: id});
   ctx.body = todos;
 };
 const destroy = async (ctx: Context) => {
