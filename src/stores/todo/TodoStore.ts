@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { makeAutoObservable } from 'mobx';
 
-import { ITodo } from '../interface';
+import { ITodo } from '../../interface';
 
-export default class TodoStore {
+class TodoStore {
     todos:ITodo[] = [];
     loading: boolean = true;
     constructor() {
@@ -11,7 +11,7 @@ export default class TodoStore {
     }
     async getData() {
       this.loading  = true;
-      const response = await axios.get('http://localhost:3000/api/todo');
+      const response = await axios.get(`/api/todo`);
       this.todos = response.data;
       this.loading = false;
     }
@@ -29,3 +29,4 @@ export default class TodoStore {
       this.todos[idx].check = check;
     }
 }
+export default TodoStore;

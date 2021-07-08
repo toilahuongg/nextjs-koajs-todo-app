@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import TodoStore from "./todoStore";
+import TodoStore from "./todo/TodoStore";
 
 const storesContext = createContext({
     todoStore: new TodoStore()

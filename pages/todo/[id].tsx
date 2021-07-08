@@ -1,85 +1,55 @@
 import { observer } from "mobx-react";
 import { useRouter } from "next/dist/client/router";
-import React, { ChangeEvent, useEffect, useState } from "react";
-import {
-  Page,
-  FormLayout,
-  TextField,
-  Card,
-  Form,
-  Select,
-} from "@shopify/polaris";
-import useStores from "src/hook/use-stores";
+import React, { ChangeEvent, useContext, useEffect, useState } from "react";
+import { Page, Card } from "@shopify/polaris";
 import axios from "axios";
+import TodoForm from "src/components/Todo/TodoForm";
+import DetailTodoContext from "src/context/DetailTodoContext";
+import { NextPage, NextPageContext } from "next";
 
-const EditTodo = observer(() => {
+type TProps = {
+  id: string;
+};
+const EditTodo: NextPage<TProps> = observer(({ id }) => {
   const router = useRouter();
-  const { id } = router.query;
-  const { todoStore } = useStores();
+  const [loading, setLoading] = useState<boolean>(false);
+  const detailTodoStore = useContext(DetailTodoContext);
+  const { title, content, check, getTodo } = detailTodoStore;
 
   useEffect(() => {
-    todoStore.getData();
+    getTodo(id);
   }, []);
 
-  const todo = todoStore.todos.find((todo) => todo._id === id);
-  if (todo === undefined) return <h1>Not Found</h1>;
-  const [content, setContent] = useState<string>(todo.content);
-  const [check, setCheck] = useState<string>(todo.check ? "true" : "false");
-
-  const options = [
-    { label: "Chưa làm", value: "false" },
-    { label: "Đã làm", value: "true" },
-  ];
-
-  const handleSelectChange = (value: string) => {
-    setCheck(value);
-  };
-  const handeChangeContent = (value: string) => {
-    setContent(value);
-  };
-
+  if (title === "") return <h1> Not found </h1>;
   const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
     console.log({ content, check });
     const data = {
+      title,
       content,
-      check: check === "false" ? false : true,
+      check: check,
     };
-    const response = await axios.put(
-      `http://localhost:3000/api/todo/${id}`,
-      data
-    );
+    const response = await axios.put(`/api/todo/${id}`, data);
     console.log(response.data);
-    router.push('/')
-
+    setLoading(false);
+    router.push("/");
   };
   return (
     <Page
       breadcrumbs={[{ content: "Todo App", url: "/" }]}
       title="Edit Todo"
-      primaryAction={{ content: "Update", onAction: handleSubmit }}
+      primaryAction={{ content: "Update", onAction: handleSubmit, loading }}
     >
-      <Card>
-        <Form onSubmit={handleSubmit}>
-          <FormLayout>
-            <TextField
-              label=""
-              value={content}
-              onChange={handeChangeContent}
-              placeholder="Content..."
-              connectedRight={
-                <Select
-                  label=""
-                  options={options}
-                  onChange={handleSelectChange}
-                  value={check}
-                />
-              }
-            />
-          </FormLayout>
-        </Form>
+      <Card sectioned>
+        <TodoForm submit={handleSubmit} />
       </Card>
     </Page>
   );
 });
+EditTodo.getInitialProps = (context: NextPageContext) => {
+  const { query } = context;
+  const { id } = query;
+  return { id: id as string };
+};
 export default EditTodo;

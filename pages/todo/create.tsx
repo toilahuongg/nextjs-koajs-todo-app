@@ -1,71 +1,38 @@
-import {
-  Page,
-  Card,
-  Form,
-  FormLayout,
-  TextField,
-  Select,
-} from "@shopify/polaris";
-import React, { ChangeEvent, useState } from "react";
+import { Page, Card } from "@shopify/polaris";
+import React, { ChangeEvent, useContext, useState } from "react";
 import { observer } from "mobx-react";
 
 import axios from "axios";
 import { useRouter } from "next/dist/client/router";
+import TodoForm from "src/components/Todo/TodoForm";
+import DetailTodoContext from "src/context/DetailTodoContext";
 
 const Home = observer(() => {
   const router = useRouter();
-  const [content, setContent] = useState<string>("");
-  const [check, setCheck] = useState<string>("false");
-  const options = [
-    { label: "Chưa làm", value: "false" },
-    { label: "Đã làm", value: "true" },
-  ];
-
-  const handleSelectChange = (value: string) => {
-    setCheck(value);
-  };
-  const handeChangeContent = (value: string) => {
-    setContent(value);
-  };
+  const [loading, setLoading] = useState<boolean>(false);
+  const detailTodoStore = useContext(DetailTodoContext);
+  const { title, content, check } = detailTodoStore;
   const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setLoading(true);
     console.log({ content, check });
     const data = {
+      title,
       content,
-      check: check === "false" ? false : true,
+      check: check,
     };
-    const response = await axios.post(
-      "http://localhost:3000/api/todo/create",
-      data
-    );
+    const response = await axios.post("/api/todo/create", data);
     console.log(response.data);
-    router.push('/');
+    setLoading(false);
+    router.push("/");
   };
   return (
     <Page
       breadcrumbs={[{ content: "Todo App", url: "/" }]}
-      title="Create Todo"
-      primaryAction={{ content: "Add", onAction: handleSubmit }}
+      primaryAction={{ content: "Add", onAction: handleSubmit, loading }}
     >
-      <Card>
-        <Form onSubmit={handleSubmit}>
-          <FormLayout>
-            <TextField
-              label=""
-              value={content}
-              onChange={handeChangeContent}
-              placeholder="Content..."
-              connectedRight={
-                <Select
-                  label=""
-                  options={options}
-                  onChange={handleSelectChange}
-                  value={check}
-                />
-              }
-            />
-          </FormLayout>
-        </Form>
+      <Card title="Create Todo" sectioned>
+        <TodoForm submit={handleSubmit} />
       </Card>
     </Page>
   );

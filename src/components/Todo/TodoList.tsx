@@ -1,24 +1,26 @@
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { DataTable, Checkbox, Button, Spinner, Modal, TextContainer } from "@shopify/polaris";
 import { observer } from "mobx-react";
-import useStores from "src/hook/use-stores";
 import axios from "axios";
 import { ITodo } from "src/interface";
+import TodoContext from "src/context/TodoContext";
 
 const TodoList = observer(() => {
-  const { todoStore } = useStores();
+  const todoStore = useContext(TodoContext);
   const [ open, setOpen] = useState<boolean>(false);
   const [ deleteId, setDeleteId] = useState<string>("");
-
+  const [ loading, setLoading ] = useState<boolean>(false);
   useEffect(() => {
     todoStore.getData();
   },[])
   const handleRemove = async() => {
-    await axios.delete(`http://localhost:3000/api/todo/${deleteId}`);
+    setLoading(true);
+    await axios.delete(`/api/todo/${deleteId}`);
     todoStore.removeTodo(deleteId);
     setOpen(false);
     setDeleteId("");
+    setLoading(false);
   };
   const handleChangeCheck = async (newChecked: boolean, todo: ITodo) => {
     todoStore.checkTodo(todo._id, newChecked);
@@ -27,7 +29,7 @@ const TodoList = observer(() => {
       check: newChecked,
     };
     const response = await axios.put(
-      `http://localhost:3000/api/todo/${todo._id}`,
+      `/api/todo/${todo._id}`,
       data
     );
     console.log(response.data);
@@ -37,7 +39,7 @@ const TodoList = observer(() => {
     setOpen(true);
   }
   const rows = todoStore.todos.map((todo) => [
-    todo._id,
+    todo.title,
     todo.content,
     <Checkbox
       label=""
@@ -72,7 +74,7 @@ const TodoList = observer(() => {
     <>
     <DataTable
       columnContentTypes={["text", "numeric", "numeric", "numeric"]}
-      headings={["Id", "Content", "Check", "Action"]}
+      headings={["Title", "Content", "Check", "Action"]}
       rows={rows}
       hoverable
       totals={["", "", "", todoStore.todos.length]}
@@ -84,7 +86,8 @@ const TodoList = observer(() => {
         primaryAction={{
           content: 'Delete',
           destructive: true,
-          onAction: handleRemove
+          onAction: handleRemove,
+          loading
         }}
       >
         <Modal.Section>

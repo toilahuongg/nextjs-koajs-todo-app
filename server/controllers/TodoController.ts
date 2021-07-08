@@ -6,8 +6,9 @@ const index = async (ctx: Context) => {
   ctx.body = todos;
 };
 const create = async (ctx: Context) => {
-  const { content, check } = ctx.request.body as any;
+  const { title, content, check } = ctx.request.body as any;
   const newTodo = await TodoModel.create({
+    title: title || "",
     content: content || "",
     check: check || false,
   });
@@ -25,8 +26,9 @@ const destroy = async (ctx: Context) => {
 };
 const update = async (ctx: Context) => {
   const { id } = ctx.params;
-  const { content, check } = ctx.request.body as any;
+  const { title, content, check } = ctx.request.body as any;
   const todo = await TodoModel.updateOne({_id: id},{
+    title: title || "",
     content: content || "",
     check: check || false,
   });

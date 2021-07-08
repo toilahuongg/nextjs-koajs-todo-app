@@ -2,7 +2,7 @@ import { Page, Card } from "@shopify/polaris";
 import React from "react";
 import { observer } from "mobx-react";
 
-import TodoList from "./todo/components/TodoList";
+import TodoList from "../src/components/Todo/TodoList";
 
 const Home = observer(() => {
   return (
