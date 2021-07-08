@@ -17,7 +17,7 @@ class TodoStore {
     }
     
     addTodo(todo: ITodo) {
-      this.todos.push(todo);
+      this.todos = [todo,...this.todos];
     }
 
     removeTodo(id: string) {

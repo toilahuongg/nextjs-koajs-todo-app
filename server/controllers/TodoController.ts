@@ -2,7 +2,7 @@ import { Context } from "koa";
 import TodoModel from "../models/Todo";
 
 const index = async (ctx: Context) => {
-  const todos = await TodoModel.find().sort({});
+  const todos = await TodoModel.find().sort({"created_at": -1});
   ctx.body = todos;
 };
 const create = async (ctx: Context) => {

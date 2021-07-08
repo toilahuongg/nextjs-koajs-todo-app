@@ -11,6 +11,7 @@ const TodoList = observer(() => {
   const [ open, setOpen] = useState<boolean>(false);
   const [ deleteId, setDeleteId] = useState<string>("");
   const [ loading, setLoading ] = useState<boolean>(false);
+  const [ loadTodos, setLoadTodos ] = useState<boolean[]>([]);
   useEffect(() => {
     todoStore.getData();
   },[])
@@ -38,6 +39,27 @@ const TodoList = observer(() => {
     setDeleteId(id);
     setOpen(true);
   }
+  const handleClickClone = async (todo: ITodo) => {
+    let arrLoading = [...loadTodos];
+    arrLoading[todo._id] = true;
+    setLoadTodos(arrLoading);
+    const data = {
+      title: todo.title,
+      content: todo.content,
+      check: todo.check,
+    };
+    const response = await axios.post("/api/todo/create", data);
+    console.log(response.data);
+    arrLoading[todo._id] = false;
+    setLoadTodos(arrLoading);
+    const newTodo: ITodo = {
+      _id: response.data._id,
+      title: response.data.title,
+      content: response.data.content,
+      check: response.data.check,
+    }
+    todoStore.addTodo(newTodo);
+  }
   const rows = todoStore.todos.map((todo) => [
     todo.title,
     todo.content,
@@ -54,6 +76,9 @@ const TodoList = observer(() => {
         justifyContent: "flex-end",
       }}
     >
+      <Button onClick={() => {handleClickClone(todo)}} size="slim" loading={loadTodos[todo._id]}>
+        Clone
+      </Button>
       <Link href={"/todo/"+todo._id}>
         <span><Button size="slim" outline>Edit</Button></span>
       </Link>

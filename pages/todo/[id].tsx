@@ -14,13 +14,13 @@ const EditTodo: NextPage<TProps> = observer(({ id }) => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
   const detailTodoStore = useContext(DetailTodoContext);
-  const { title, content, check, getTodo } = detailTodoStore;
+  const { title, content, check, loadTodo, getTodo } = detailTodoStore;
 
   useEffect(() => {
     getTodo(id);
   }, []);
-
-  if (title === "") return <h1> Not found </h1>;
+  if (detailTodoStore.loading === true) return <h1> Loading </h1>;
+  if (loadTodo === false) return <h1> Not found </h1>;
   const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
