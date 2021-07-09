@@ -12,54 +12,69 @@ const TodoList = observer(() => {
   const todoStore = useContext(TodoContext);
   const detailTodoStore = useContext(DetailTodoContext);
   const { id, setLoading, setOpen, setId } = detailTodoStore;
-  // const [ deleteId, setDeleteId] = useState<string>("");
-  // const [ loading, setLoading ] = useState<boolean>(false);
   const [loadTodos, setLoadTodos] = useState<boolean[]>([]);
   useEffect(() => {
     todoStore.getData();
   }, []);
-  const handleRemove = async() => {
-    setLoading(true);
-    console.log(id);
-    // await axios.delete(`/api/todo/${deleteId}`);
-    // todoStore.removeTodo(deleteId);
-    setOpen(false);
-    setId("");
-    setLoading(false);
+  const handleRemove = async () => {
+    try {
+      setLoading(true);
+      console.log(id);
+      await axios.delete(`/api/todo/${id}`);
+      todoStore.removeTodo(id);
+      setOpen(false);
+      setId("");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
   const handleChangeCheck = async (newChecked: boolean, todo: ITodo) => {
-    todoStore.checkTodo(todo._id, newChecked);
-    const data = {
-      content: todo.content,
-      check: newChecked,
-    };
-    const response = await axios.put(`/api/todo/${todo._id}`, data);
-    console.log(response.data);
+    try {
+      todoStore.checkTodo(todo._id, newChecked);
+      const data = {
+        title: todo.title,
+        content: todo.content,
+        check: newChecked,
+      };
+      const response = await axios.put(`/api/todo/${todo._id}`, data);
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleClickRemove = (id: string) => {
     setId(id);
     setOpen(true);
   };
   const handleClickClone = async (todo: ITodo) => {
-    let arrLoading = [...loadTodos];
-    arrLoading[todo._id] = true;
-    setLoadTodos(arrLoading);
-    const data = {
-      title: todo.title,
-      content: todo.content,
-      check: todo.check,
-    };
-    const response = await axios.post("/api/todo/create", data);
-    console.log(response.data);
-    arrLoading[todo._id] = false;
-    setLoadTodos(arrLoading);
-    const newTodo: ITodo = {
-      _id: response.data._id,
-      title: response.data.title,
-      content: response.data.content,
-      check: response.data.check,
-    };
-    todoStore.addTodo(newTodo);
+    try {
+      let arrLoading = [...loadTodos];
+      arrLoading[todo._id] = true;
+      setLoadTodos(arrLoading);
+      const data = {
+        title: todo.title,
+        content: todo.content,
+        check: todo.check,
+      };
+      const response = await axios.post("/api/todo", data);
+      console.log(response.data);
+
+      const newTodo: ITodo = {
+        _id: response.data._id,
+        title: response.data.title,
+        content: response.data.content,
+        check: response.data.check,
+      };
+      todoStore.addTodo(newTodo);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      let arrLoading = [...loadTodos];
+      arrLoading[todo._id] = false;
+      setLoadTodos(arrLoading);
+    }
   };
   const rows = todoStore.todos.map((todo) => [
     todo.title,
@@ -120,7 +135,7 @@ const TodoList = observer(() => {
         hoverable
         totals={["", "", "", todoStore.todos.length]}
       />
-      <ModalRemove action={handleRemove}/>
+      <ModalRemove action={handleRemove} />
     </>
   );
 });

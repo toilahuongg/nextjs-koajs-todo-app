@@ -22,18 +22,23 @@ const EditTodo: NextPage<TProps> = observer(({ id }) => {
   if (detailTodoStore.loading === true) return <h1> Loading </h1>;
   if (loadTodo === false) return <h1> Not found </h1>;
   const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setLoading(true);
-    console.log({ content, check });
-    const data = {
-      title,
-      content,
-      check: check,
-    };
-    const response = await axios.put(`/api/todo/${id}`, data);
-    console.log(response.data);
-    setLoading(false);
-    router.push("/");
+    try {
+      event.preventDefault();
+      setLoading(true);
+      console.log({ content, check });
+      const data = {
+        title,
+        content,
+        check: check,
+      };
+      const response = await axios.put(`/api/todo/${id}`, data);
+      console.log(response.data);
+      router.push("/");
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
   };
   return (
     <Page
