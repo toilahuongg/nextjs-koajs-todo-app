@@ -1,33 +1,33 @@
-import { Modal, TextContainer } from "@shopify/polaris"
+import { Modal, TextContainer } from "@shopify/polaris";
 import { observer } from "mobx-react";
-import React, { useContext } from "react";
-import { DetailTodoContext } from "./model";
+import React from "react";
 type TProp = {
-    action: () => void
-}
-const ModalRemove: React.FC<TProp> = observer(({ action }) => {
-    const todoStore = useContext(DetailTodoContext);
-    const { open, setOpen, loading } = todoStore;
+  action: () => void;
+  open: boolean;
+  loading: boolean;
+  toggleOpen: () => void;
+};
+const ModalRemove: React.FC<TProp> = observer(
+  ({ action, open, toggleOpen, loading }) => {
     return (
-        <Modal
+      <Modal
         open={open}
-        onClose={() => setOpen(false)}
+        onClose={toggleOpen}
         title="Delete"
         primaryAction={{
-          content: 'Delete',
+          content: "Delete",
           destructive: true,
           onAction: action,
-          loading
+          loading,
         }}
       >
         <Modal.Section>
           <TextContainer>
-            <p>
-              Bạn có chắc chắn muốn xóa?
-            </p>
+            <p>Bạn có chắc chắn muốn xóa?</p>
           </TextContainer>
         </Modal.Section>
       </Modal>
-    )
-});
+    );
+  }
+);
 export default ModalRemove;

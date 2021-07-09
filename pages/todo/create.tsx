@@ -5,13 +5,13 @@ import { observer } from "mobx-react";
 import axios from "axios";
 import { useRouter } from "next/dist/client/router";
 import TodoForm from "src/components/Todo/TodoForm";
-import { DetailTodoContext } from "src/components/Todo/model";
+import RootContext from "src/context/RootContext";
 
 const Home = observer(() => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
-  const detailTodoStore = useContext(DetailTodoContext);
-  const { title, content, check } = detailTodoStore;
+  const store = useContext(RootContext);
+  const { title, content, check } = store.detailTodo;
   const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();

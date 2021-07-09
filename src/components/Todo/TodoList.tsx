@@ -4,35 +4,46 @@ import { DataTable, Checkbox, Button, Spinner } from "@shopify/polaris";
 import { observer } from "mobx-react";
 import axios from "axios";
 import { ITodo } from "src/interface";
-import TodoContext from "src/context/TodoContext";
 import style from "./style.module.scss";
-import { DetailTodoContext } from "./model";
 import ModalRemove from "./ModalRemove";
+import RootContext from "src/context/RootContext";
 const TodoList = observer(() => {
-  const todoStore = useContext(TodoContext);
-  const detailTodoStore = useContext(DetailTodoContext);
-  const { id, setLoading, setOpen, setId } = detailTodoStore;
+  const store = useContext(RootContext);
+  const [loadingTodoList, setLoadingTodoList] = useState<boolean>(true);
+  const [open, setOpen] = useState<boolean>(false);
+  const [loadingActionRemove, setLoadingActionRemove] = useState<boolean>(false);
   const [loadTodos, setLoadTodos] = useState<boolean[]>([]);
+  const [removeId, setRemoveId] = useState<string>("");
+
   useEffect(() => {
-    todoStore.getData();
+    (async () => {
+      try {
+        setLoadingTodoList(true);
+        await store.getTodoList();
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoadingTodoList(false);
+      }
+    })();
   }, []);
+  const toggleOpen = () => setOpen(!open);
   const handleRemove = async () => {
     try {
-      setLoading(true);
-      console.log(id);
-      await axios.delete(`/api/todo/${id}`);
-      todoStore.removeTodo(id);
+      setLoadingActionRemove(true);
+      await axios.delete(`/api/todo/${removeId}`);
+      store.removeTodo(removeId);
       setOpen(false);
-      setId("");
+      setRemoveId("");
     } catch (error) {
       console.log(error);
     } finally {
-      setLoading(false);
+      setLoadingActionRemove(false);
     }
   };
   const handleChangeCheck = async (newChecked: boolean, todo: ITodo) => {
     try {
-      todoStore.checkTodo(todo._id, newChecked);
+      store.checkTodo(todo._id);
       const data = {
         title: todo.title,
         content: todo.content,
@@ -45,7 +56,7 @@ const TodoList = observer(() => {
     }
   };
   const handleClickRemove = (id: string) => {
-    setId(id);
+    setRemoveId(id);
     setOpen(true);
   };
   const handleClickClone = async (todo: ITodo) => {
@@ -67,7 +78,7 @@ const TodoList = observer(() => {
         content: response.data.content,
         check: response.data.check,
       };
-      todoStore.addTodo(newTodo);
+      store.addTodo(newTodo);
     } catch (error) {
       console.log(error);
     } finally {
@@ -76,7 +87,7 @@ const TodoList = observer(() => {
       setLoadTodos(arrLoading);
     }
   };
-  const rows = todoStore.todos.map((todo) => [
+  const rows = store.todoList.map((todo) => [
     todo.title,
     todo.content,
     <Checkbox
@@ -111,7 +122,7 @@ const TodoList = observer(() => {
       </Button>
     </div>,
   ]);
-  if (todoStore.loading)
+  if (loadingTodoList)
     return (
       <DataTable
         columnContentTypes={["text", "numeric", "numeric", "numeric"]}
@@ -133,9 +144,14 @@ const TodoList = observer(() => {
         headings={["Title", "Content", "Check", "Action"]}
         rows={rows}
         hoverable
-        totals={["", "", "", todoStore.todos.length]}
+        totals={["", "", "", store.todoList.length]}
       />
-      <ModalRemove action={handleRemove} />
+      <ModalRemove
+        loading={loadingActionRemove}
+        action={handleRemove}
+        open={open}
+        toggleOpen={toggleOpen}
+      />
     </>
   );
 });

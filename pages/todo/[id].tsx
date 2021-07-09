@@ -5,7 +5,7 @@ import { Page, Card } from "@shopify/polaris";
 import axios from "axios";
 import TodoForm from "src/components/Todo/TodoForm";
 import { NextPage, NextPageContext } from "next";
-import { DetailTodoContext } from "src/components/Todo/model";
+import RootContext from "src/context/RootContext";
 
 type TProps = {
   id: string;
@@ -13,14 +13,26 @@ type TProps = {
 const EditTodo: NextPage<TProps> = observer(({ id }) => {
   const router = useRouter();
   const [loading, setLoading] = useState<boolean>(false);
-  const detailTodoStore = useContext(DetailTodoContext);
-  const { title, content, check, loadTodo, getTodo } = detailTodoStore;
+  const [loadingTodo, setLoadingTodo] = useState<boolean>(false);
+  const [isTodo, setIsTodo] = useState<boolean>(true);
+  const store = useContext(RootContext);
+  const { title, content, check, getTodo } = store.detailTodo;
 
   useEffect(() => {
-    getTodo(id);
+    (async() => {
+      try {
+        setLoadingTodo(true);
+        await getTodo(id);
+      } catch (error) {
+        console.log(error);
+        setIsTodo(false);
+      } finally {
+        setLoadingTodo(false);
+      }
+    })()
   }, []);
-  if (detailTodoStore.loading === true) return <h1> Loading </h1>;
-  if (loadTodo === false) return <h1> Not found </h1>;
+  if (loadingTodo === true) return <h1> Loading </h1>;
+  if (isTodo === false) return <h1> Not found </h1>;
   const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
