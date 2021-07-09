@@ -2,7 +2,7 @@ import { Context } from "koa";
 import TodoModel from "../models/Todo";
 
 const index = async (ctx: Context) => {
-  const todos = await TodoModel.find().sort({"created_at": -1});
+  const todos = await TodoModel.find().sort({"created_at": -1}).lean();
   ctx.body = todos;
 };
 const create = async (ctx: Context) => {
@@ -16,7 +16,7 @@ const create = async (ctx: Context) => {
 };
 const show = async (ctx: Context) => {
   const { id } = ctx.params;
-  const todos = await TodoModel.findById({_id: id});
+  const todos = await TodoModel.findById({_id: id}).lean();
   ctx.body = todos;
 };
 const destroy = async (ctx: Context) => {

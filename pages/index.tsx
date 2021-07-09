@@ -1,16 +1,9 @@
-import { Page, Card } from "@shopify/polaris";
 import React from "react";
-import { observer } from "mobx-react";
+import TodoComponent from "src/components/Todo";
 
-import TodoList from "../src/components/Todo/TodoList";
-
-const Home = observer(() => {
+const Home = () => {
   return (
-    <Page title="Todo App" primaryAction={{ content: "Add Todo", url: "/todo/create" }}>
-      <Card>
-        <TodoList />
-      </Card>
-    </Page>
+    <TodoComponent />
   );
-});
+};
 export default Home;
