@@ -1,7 +1,7 @@
 import { Form, FormLayout, TextField, Checkbox } from "@shopify/polaris";
 import { observer } from "mobx-react";
 import React, { FormEvent, useContext } from "react";
-import DetailTodoContext from "src/context/DetailTodoContext";
+import { DetailTodoContext } from "./model";
 
 type TWrapProps = {
     submit: (event: FormEvent<HTMLFormElement>) => void

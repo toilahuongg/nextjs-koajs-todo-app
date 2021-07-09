@@ -4,8 +4,8 @@ import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import { Page, Card } from "@shopify/polaris";
 import axios from "axios";
 import TodoForm from "src/components/Todo/TodoForm";
-import DetailTodoContext from "src/context/DetailTodoContext";
 import { NextPage, NextPageContext } from "next";
+import { DetailTodoContext } from "src/components/Todo/model";
 
 type TProps = {
   id: string;

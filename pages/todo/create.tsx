@@ -5,7 +5,7 @@ import { observer } from "mobx-react";
 import axios from "axios";
 import { useRouter } from "next/dist/client/router";
 import TodoForm from "src/components/Todo/TodoForm";
-import DetailTodoContext from "src/context/DetailTodoContext";
+import { DetailTodoContext } from "src/components/Todo/model";
 
 const Home = observer(() => {
   const router = useRouter();
