@@ -27,7 +27,9 @@ const TodoList = observer(() => {
       }
     })();
   }, []);
+
   const toggleOpen = () => setOpen(!open);
+
   const handleRemove = async () => {
     try {
       setLoadingActionRemove(true);
@@ -41,6 +43,7 @@ const TodoList = observer(() => {
       setLoadingActionRemove(false);
     }
   };
+
   const handleChangeCheck = async (newChecked: boolean, todo: ITodo) => {
     try {
       store.checkTodo(todo._id);
@@ -55,17 +58,19 @@ const TodoList = observer(() => {
       console.log(error);
     }
   };
+
   const handleClickRemove = (id: string) => {
     setRemoveId(id);
     setOpen(true);
   };
+
   const handleClickClone = async (todo: ITodo) => {
     try {
       let arrLoading = [...loadTodos];
       arrLoading[todo._id] = true;
       setLoadTodos(arrLoading);
       const data = {
-        title: todo.title,
+        title: todo.title+" (Sao chép)",
         content: todo.content,
         check: todo.check,
       };
@@ -87,6 +92,7 @@ const TodoList = observer(() => {
       setLoadTodos(arrLoading);
     }
   };
+
   const rows = store.todoList.map((todo) => [
     todo.title,
     todo.content,
@@ -122,6 +128,7 @@ const TodoList = observer(() => {
       </Button>
     </div>,
   ]);
+
   if (loadingTodoList)
     return (
       <DataTable

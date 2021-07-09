@@ -9,6 +9,7 @@ type TWrapProps = {
 const TodoForm: React.FC<TWrapProps> = observer(({ submit }: TWrapProps) => {
   const store = useContext(RootContext);
   const { title, content, check, setTitle, setContent, toggleCheck } =store.detailTodo;
+  
   return (
     <Form onSubmit={submit}>
       <FormLayout>

@@ -4,6 +4,7 @@ import { observer } from "mobx-react";
 
 import axios from "axios";
 import { useRouter } from "next/dist/client/router";
+
 import TodoForm from "src/components/Todo/TodoForm";
 import RootContext from "src/context/RootContext";
 
@@ -12,6 +13,7 @@ const Home = observer(() => {
   const [loading, setLoading] = useState<boolean>(false);
   const store = useContext(RootContext);
   const { title, content, check } = store.detailTodo;
+
   const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
@@ -32,6 +34,7 @@ const Home = observer(() => {
     }
     
   };
+  
   return (
     <Page
       breadcrumbs={[{ content: "Todo App", url: "/" }]}

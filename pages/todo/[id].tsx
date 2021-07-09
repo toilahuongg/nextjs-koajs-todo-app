@@ -1,10 +1,11 @@
 import { observer } from "mobx-react";
 import { useRouter } from "next/dist/client/router";
+import { NextPage, NextPageContext } from "next";
 import React, { ChangeEvent, useContext, useEffect, useState } from "react";
 import { Page, Card } from "@shopify/polaris";
 import axios from "axios";
+
 import TodoForm from "src/components/Todo/TodoForm";
-import { NextPage, NextPageContext } from "next";
 import RootContext from "src/context/RootContext";
 
 type TProps = {
@@ -31,8 +32,10 @@ const EditTodo: NextPage<TProps> = observer(({ id }) => {
       }
     })()
   }, []);
+
   if (loadingTodo === true) return <h1> Loading </h1>;
   if (isTodo === false) return <h1> Not found </h1>;
+
   const handleSubmit = async (event: ChangeEvent<HTMLFormElement>) => {
     try {
       event.preventDefault();
@@ -52,6 +55,7 @@ const EditTodo: NextPage<TProps> = observer(({ id }) => {
       setLoading(false);
     }
   };
+  
   return (
     <Page
       breadcrumbs={[{ content: "Todo App", url: "/" }]}
